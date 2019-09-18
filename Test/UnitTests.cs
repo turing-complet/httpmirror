@@ -26,5 +26,15 @@ namespace Test
             Dictionary<string, string> parsed = Helper.ParseQuery(query);
             Assert.AreEqual(0, parsed.Keys.Count);
         }
+
+        [TestMethod]
+        public void Test_EncodeQuery()
+        {
+            Uri uri = new Uri("https://example.com?q=foo&token=asdf");
+            string query = uri.Query;
+            string encoded = Helper.EncodeQuery(query);
+            // Console.WriteLine(encoded);
+            Assert.AreEqual("cTtmb290b2tlbjthc2Rm", encoded);
+        }
     }
 }

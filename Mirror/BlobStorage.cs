@@ -1,6 +1,8 @@
 using System;
 using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Blob;
+using System.Linq;
+using System.Text;
 
 namespace Mirror
 {
@@ -10,7 +12,7 @@ namespace Mirror
 
         private CloudBlobContainer _blobContainer;
         private string _root;
-        
+        private string _containerName => string.Join("-", _root.Split('.'));
         public BlobStorage() : this("testroot.com")
         {
         }
@@ -22,7 +24,7 @@ namespace Mirror
             if (CloudStorageAccount.TryParse(connectionString, out storageAccount))
             {
                 CloudBlobClient cloudBlobClient = storageAccount.CreateCloudBlobClient();
-                _blobContainer = cloudBlobClient.GetContainerReference(root);
+                _blobContainer = cloudBlobClient.GetContainerReference(_containerName);
                 _blobContainer.CreateIfNotExists();
             }
         }
@@ -30,40 +32,40 @@ namespace Mirror
         public string Get(string path)
         {
             var blobIdent = BlobResource.Parse(_root, path);
-            throw new System.NotImplementedException();
+            CloudBlockBlob blob = _blobContainer.GetBlockBlobReference(blobIdent.Id);
+            string content = blob.DownloadText();
+            return content;
         }
 
         public void Put(string path, string content)
         {
-            throw new System.NotImplementedException();
+            var blobIdent = BlobResource.Parse(_root, path);
+            CloudBlockBlob blob = _blobContainer.GetBlockBlobReference(blobIdent.Id);
+            blob.UploadText(content);
         }
 
         public bool Exists(string path)
         {
-            CloudBlockBlob blob = _blobContainer.GetBlockBlobReference(path);
+            var blobIdent = BlobResource.Parse(_root, path);
+            CloudBlockBlob blob = _blobContainer.GetBlockBlobReference(blobIdent.Id);
             return blob.Exists();
         }
+    }
 
-        private class BlobResource
+    internal class BlobResource
+    {
+        public string Path { get; set;}
+        public string BlobName { get; set;}
+        public string Id => System.IO.Path.Combine(Path, BlobName);
+
+        public static BlobResource Parse(string root, string requestUri)
         {
-            public string Path { get; set;}
-            public string BlobName { get; set;}
+            Uri uri = new Uri(new Uri(root), requestUri);
+            var blob = new BlobResource();
+            blob.Path = uri.LocalPath;
+            blob.BlobName = Helper.EncodeQuery(uri.Query);
 
-            public static BlobResource Parse(string root, string requestUri)
-            {
-                Uri uri = new Uri(new Uri(root), requestUri);
-                var blob = new BlobResource();
-                blob.Path = uri.LocalPath;
-                blob.BlobName = encodeQuery(uri.Query);
-
-                return blob;
-            }
-
-            private static string encodeQuery(string query)
-            {
-                var parsed = Helper.ParseQuery(query);
-                return "todo";
-            }
+            return blob;
         }
     }
 
