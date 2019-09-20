@@ -20,10 +20,9 @@ namespace Mirror
 
         public MirrorClient(string domain)
         {
-            var baseUri = new Uri(domain);
-            _storage = new BlobStorage(baseUri.Host);
+            _storage = new BlobStorage(domain);
             _client = new HttpClient();
-            _client.BaseAddress = baseUri;
+            _client.BaseAddress = new Uri(domain);
         }
 
         public async Task<string> GetAsync(string requestUri)

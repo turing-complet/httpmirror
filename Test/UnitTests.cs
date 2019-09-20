@@ -36,5 +36,17 @@ namespace Test
             // Console.WriteLine(encoded);
             Assert.AreEqual("cTtmb290b2tlbjthc2Rm", encoded);
         }
+
+        [TestMethod]
+        public void Test_JsonMirror()
+        {
+            string domain = "https://api.limeade.cloud";
+            string path = "/api/diagnostic/healthcheck?q=true";
+            var client = new MirrorClient(domain);
+            var resp = client.GetAsync(path);
+            var storage = new BlobStorage(domain);
+            var cached = storage.Get(path);
+            Assert.IsNotNull(cached);
+        }
     }
 }
