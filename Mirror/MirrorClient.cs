@@ -10,7 +10,7 @@ namespace Mirror
         {
             get
             {
-                string result = Environment.GetEnvironmentVariable("ENABLE_MIRROR");
+                string result = Config.Enabled;
                 return result != null ? result == "1" : true;
             }
         }
@@ -27,7 +27,7 @@ namespace Mirror
 
         public async Task<string> GetAsync(string requestUri)
         {
-            if (_storage.Exists(requestUri))
+            if (enabled && _storage.Exists(requestUri))
             {
                 return _storage.Get(requestUri);
             }
@@ -36,7 +36,11 @@ namespace Mirror
             var resp = await _client.SendAsync(request);
 
             string content = await resp.Content.ReadAsStringAsync();
-            _storage.Put(requestUri, content);
+
+            if (enabled)
+            {
+                _storage.Put(requestUri, content);
+            }
 
             return content;
         }

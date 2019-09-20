@@ -1,14 +1,12 @@
 using System;
 using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Blob;
-using System.Linq;
-using System.Text;
 
 namespace Mirror
 {
     public class BlobStorage : IStorage
     {
-        private const string connectionString = "DefaultEndpointsProtocol=https;AccountName=mirrortest;AccountKey=lwKOcMreWeRKRDGnR6vNvnubbnhqxxZZVAVpVIQcp4rkh9njfPeVZV8nEA+GCW/KTzHL8N8r7Q/AUAwc3MfgYg==;EndpointSuffix=core.windows.net";
+        private static string connectionString => Config.BlobConnection;
 
         private CloudBlobContainer _blobContainer;
         private Uri _rootUri;
