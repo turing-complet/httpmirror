@@ -11,5 +11,5 @@ var resp2 = client.GetAsync("/api/cats/info")
 ```
 
 TODO:
-read blob connection from environment variable
-Disable without changing code by setting ENABLE_MIRROR=0
+* read blob connection from environment variable
+* Disable without changing code by setting ENABLE_MIRROR=0
